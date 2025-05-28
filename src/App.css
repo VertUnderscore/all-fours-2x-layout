@@ -69,9 +69,9 @@ body {
 }
 
 .innerplayercontainer {
-  display: flex;       /* Add this */
-  gap: 10px;           /* Optional: adds spacing between seed and player */
-  align-items: baseline; /* Optional: aligns them vertically */
+  display: flex;      
+  gap: 10px;          
+  align-items: baseline; 
   padding: 21px;
 }
 
@@ -213,4 +213,5 @@ body {
   position: absolute;
   display: block;
   top: 1100px;
+  font-size: xx-large;
 }

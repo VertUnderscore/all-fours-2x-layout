@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './App.css'
 
-function formatTime(seconds:number) {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+function formatTime(milliseconds: number) {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
 
   // Pad with leading zeros if needed
   const formattedMinutes = String(minutes).padStart(2, '0');
@@ -14,7 +15,7 @@ function formatTime(seconds:number) {
 
 function getFlagEmoji(countryCode:string) {
   if (typeof countryCode !== 'string' || countryCode.length !== 2) {
-    throw new Error("Country code must be a 2-letter string.");
+    return "";
   }
 
   // Convert to uppercase and map each character to regional indicator symbols
@@ -37,8 +38,53 @@ function App() {
   const [commentator2Country, setCommentator2Country] = useState("jp")
   const [player1Timer, setPlayer1Timer] = useState(0)
   const [player2Timer, setPlayer2Timer] = useState(0)
+  const [player1TimerIsActive, setPlayer1TimerIsActive] = useState(false)
+  const [player2TimerIsActive, setPlayer2TimerIsActive] = useState(false)
   const [commentator1, setCommentator1] = useState("Commentator 1")
   const [commentator2, setCommentator2] = useState("Commentator 2")
+  const player1Interval = useRef<number | null>(null)
+  const player2Interval = useRef<number | null>(null)
+
+
+
+  const handleStart = (isRunning : boolean, setIsRunning : React.Dispatch<React.SetStateAction<boolean>>) => {
+    setIsRunning(true);
+  };
+
+  const handlePause = (setIsRunning : React.Dispatch<React.SetStateAction<boolean>>) => {
+    setIsRunning(false);
+  };
+
+  const handleStop = (setIsRunning : React.Dispatch<React.SetStateAction<boolean>>, setTime : React.Dispatch<React.SetStateAction<number>>) => {
+    setIsRunning(false);
+    setTime(0);
+  };
+
+// Player 1 Timer
+
+  useEffect(() => {
+    if (player1TimerIsActive) {
+      player1Interval.current = setInterval(() => {
+        setPlayer1Timer(prevTime => prevTime + 10);
+      }, 10);
+    }
+
+    return () => {
+      if (player1Interval.current !== null) clearInterval(player1Interval.current)
+    }
+  }, [player1TimerIsActive]);
+
+  useEffect(() => {
+    if (player2TimerIsActive) {
+      player2Interval.current = setInterval(() => {
+        setPlayer2Timer(prevTime => prevTime + 10);
+      }, 10);
+    }
+
+    return () => {
+      if (player2Interval.current !== null) clearInterval(player2Interval.current)
+    }
+  }, [player2TimerIsActive]);
   
   const splitPronouns = (pronouns: string): [string, string] => {
     const parts = pronouns.split("/");
@@ -61,7 +107,6 @@ function App() {
   return (
     <>
     <div className='layout'> {/* Visual On The Stream */}
-
       <div className='outerplayercontainer right' id='player1'> {/* Player 1 Name And Seed */}
         <div className='center'>
           <div className='innerplayercontainer'><div className='seed'>{player1Seed}</div><div className='player'>{player1.toUpperCase()}</div></div>
@@ -131,6 +176,21 @@ function App() {
           <input type='text' value={commentator2Pronouns} onChange={e => setCommentator2Pronouns(e.target.value)} />
           <input type='text' value={commentator2Country} onChange={e => setCommentator2Country(e.target.value)} />
         </div>
+      </div>
+      <div className='timercontrols'>
+        <button className='pause' onClick={() => {handlePause(setPlayer1TimerIsActive); handlePause(setPlayer2TimerIsActive);}}>Pause Both Player Timers</button>
+        <button className='start' onClick={() => {handleStart(player1TimerIsActive, setPlayer1TimerIsActive); handleStart(player2TimerIsActive, setPlayer2TimerIsActive); }}>Start Both Player Timers</button>
+        <button className='stop' onClick={() => {handleStop(setPlayer1TimerIsActive, setPlayer1Timer); handleStop(setPlayer2TimerIsActive, setPlayer2Timer)}}>Stop Both Player Timers</button>
+      </div>
+      <div className='timercontrols'>
+        <button className='pause' onClick={() => handlePause(setPlayer1TimerIsActive)}>Pause Player 1 Timer</button>
+        <button className='start' onClick={() => handleStart(player1TimerIsActive, setPlayer1TimerIsActive)}>Start Player 1 Time</button>
+        <button className='stop' onClick={() => handleStop(setPlayer1TimerIsActive, setPlayer1Timer)}>Stop Player 1 Time</button>
+      </div>
+      <div className='timercontrols'>
+        <button className='pause' onClick={() => handlePause(setPlayer2TimerIsActive)}>Pause Player 2 Timer</button>
+        <button className='start' onClick={() => handleStart(player2TimerIsActive, setPlayer2TimerIsActive)}>Start Player 2 Time</button>
+        <button className='stop' onClick={() => handleStop(setPlayer2TimerIsActive, setPlayer2Timer)}>Stop Player 2 Time</button>
       </div>
     </div>
 
