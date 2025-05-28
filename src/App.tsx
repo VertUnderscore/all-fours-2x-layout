@@ -49,6 +49,7 @@ function App() {
 
   const handleStart = (isRunning : boolean, setIsRunning : React.Dispatch<React.SetStateAction<boolean>>) => {
     setIsRunning(true);
+    console.log(isRunning); // im lazy sorry
   };
 
   const handlePause = (setIsRunning : React.Dispatch<React.SetStateAction<boolean>>) => {
