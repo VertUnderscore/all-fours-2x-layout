@@ -215,3 +215,24 @@ body {
   top: 1100px;
   font-size: xx-large;
 }
+
+.finished {
+  background-color: #2f3754;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin: 0 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.finished.active {
+  background-color: gold;
+  color: #2f3754;
+}
+
+.finished:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}

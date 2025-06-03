@@ -40,12 +40,16 @@ function App() {
   const [player2Timer, setPlayer2Timer] = useState(0)
   const [player1TimerIsActive, setPlayer1TimerIsActive] = useState(false)
   const [player2TimerIsActive, setPlayer2TimerIsActive] = useState(false)
+  const [player1Minutes, setPlayer1Minutes] = useState("")
+  const [player1Seconds, setPlayer1Seconds] = useState("")
+  const [player2Minutes, setPlayer2Minutes] = useState("")
+  const [player2Seconds, setPlayer2Seconds] = useState("")
+  const [player1Finished, setPlayer1Finished] = useState(false)
+  const [player2Finished, setPlayer2Finished] = useState(false)
   const [commentator1, setCommentator1] = useState("Commentator 1")
   const [commentator2, setCommentator2] = useState("Commentator 2")
   const player1Interval = useRef<number | null>(null)
   const player2Interval = useRef<number | null>(null)
-
-
 
   const handleStart = (isRunning : boolean, setIsRunning : React.Dispatch<React.SetStateAction<boolean>>) => {
     setIsRunning(true);
@@ -59,6 +63,21 @@ function App() {
   const handleStop = (setIsRunning : React.Dispatch<React.SetStateAction<boolean>>, setTime : React.Dispatch<React.SetStateAction<number>>) => {
     setIsRunning(false);
     setTime(0);
+  };
+
+  const handleSetTimer = (
+    minutes: string,
+    seconds: string,
+    setTimer: React.Dispatch<React.SetStateAction<number>>,
+    setMinutes: React.Dispatch<React.SetStateAction<string>>,
+    setSeconds: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const minutesNum = parseInt(minutes) || 0;
+    const secondsNum = parseInt(seconds) || 0;
+    const totalMilliseconds = (minutesNum * 60 + secondsNum) * 1000;
+    setTimer(totalMilliseconds);
+    setMinutes("");
+    setSeconds("");
   };
 
 // Player 1 Timer
@@ -123,8 +142,8 @@ function App() {
       <div className='commentary' id='commentator1'>{commentator1.toUpperCase()}</div>
       <div className='commentary' id='commentator2'>{commentator2.toUpperCase()}</div>
       
-      <div className='timer' id='timer1'>{formatTime(player1Timer)}</div>
-      <div className='timer' id='timer2'>{formatTime(player2Timer)}</div>
+      <div className='timer' id='timer1' style={{ color: player1Finished ? 'gold' : 'white' }}>{formatTime(player1Timer)}</div>
+      <div className='timer' id='timer2' style={{ color: player2Finished ? 'gold' : 'white' }}>{formatTime(player2Timer)}</div>
 
       <div className='playerflag' id="player1flag">{getFlagEmoji(player1Country)}</div>
       <div className='playerpronouns left' id='playerpronouns1'>
@@ -187,11 +206,63 @@ function App() {
         <button className='pause' onClick={() => handlePause(setPlayer1TimerIsActive)}>Pause Player 1 Timer</button>
         <button className='start' onClick={() => handleStart(player1TimerIsActive, setPlayer1TimerIsActive)}>Start Player 1 Time</button>
         <button className='stop' onClick={() => handleStop(setPlayer1TimerIsActive, setPlayer1Timer)}>Stop Player 1 Time</button>
+        <button 
+          className={`finished ${player1Finished ? 'active' : ''}`} 
+          onClick={() => setPlayer1Finished(!player1Finished)}
+        >
+          {player1Finished ? 'Unmark Finished' : 'Mark Finished'}
+        </button>
+        <div className='timerinputs'>
+          <input
+            type="number"
+            min="0"
+            placeholder="Minutes"
+            value={player1Minutes}
+            onChange={(e) => setPlayer1Minutes(e.target.value)}
+          />
+          <input
+            type="number"
+            min="0"
+            max="59"
+            placeholder="Seconds"
+            value={player1Seconds}
+            onChange={(e) => setPlayer1Seconds(e.target.value)}
+          />
+          <button onClick={() => handleSetTimer(player1Minutes, player1Seconds, setPlayer1Timer, setPlayer1Minutes, setPlayer1Seconds)}>
+            Set Timer
+          </button>
+        </div>
       </div>
       <div className='timercontrols'>
         <button className='pause' onClick={() => handlePause(setPlayer2TimerIsActive)}>Pause Player 2 Timer</button>
         <button className='start' onClick={() => handleStart(player2TimerIsActive, setPlayer2TimerIsActive)}>Start Player 2 Time</button>
         <button className='stop' onClick={() => handleStop(setPlayer2TimerIsActive, setPlayer2Timer)}>Stop Player 2 Time</button>
+        <button 
+          className={`finished ${player2Finished ? 'active' : ''}`} 
+          onClick={() => setPlayer2Finished(!player2Finished)}
+        >
+          {player2Finished ? 'Unmark Finished' : 'Mark Finished'}
+        </button>
+        <div className='timerinputs'>
+          <input
+            type="number"
+            min="0"
+            placeholder="Minutes"
+            value={player2Minutes}
+            onChange={(e) => setPlayer2Minutes(e.target.value)}
+          />
+          <input
+            type="number"
+            min="0"
+            max="59"
+            placeholder="Seconds"
+            value={player2Seconds}
+            onChange={(e) => setPlayer2Seconds(e.target.value)}
+          />
+          <button onClick={() => handleSetTimer(player2Minutes, player2Seconds, setPlayer2Timer, setPlayer2Minutes, setPlayer2Seconds)}>
+            Set Timer
+          </button>
+        </div>
       </div>
     </div>
 
